@@ -1,0 +1,26 @@
+name: Publish versioned Microsoft Store installer
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/publish-msstore-installer.yml
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staged installer commit
+        uses: actions/checkout@v4
+        with:
+          ref: ca9cc6dd137d7e944de19944785b00db47940b5f
+      - name: Verify and prepare versioned installer
+        shell: bash
+        run: |
+          echo "b185babb1352ad87871789839e2872bec1f3b47359f5113ab3eaacd8a9024118  upload/InvoiceLint-Setup.exe" | sha256sum -c -
+          cp upload/InvoiceLint-Setup.exe InvoiceLint-Setup-2026-10-08.exe
+      - name: Upload versioned Microsoft Store asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload v1.0.0 InvoiceLint-Setup-2026-10-08.exe --clobber
